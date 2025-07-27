@@ -7,45 +7,50 @@ import java.io.IOException;
 public class CSVReaderPreview {
 
     public static void main(String[] args) {
+        // Path to the CSV file
         String filePath = "dataset/dataset.csv";
         String line;
-        int totalRecords = 0;
-        int columnCount = 0;
-
-        System.out.println("=== Data Preview ===\n");
+        String separator = ",";
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // Read header
-            if ((line = br.readLine()) != null) {
-                String[] headers = line.split(",");
-                columnCount = headers.length;
 
-                System.out.println("Columns:");
-                for (String header : headers) {
-                    System.out.print(header + "\t");
-                }
-                System.out.println("\nTotal Columns: " + columnCount + "\n");
-                System.out.println("First 5 Records:");
+            String header = br.readLine();
+            if (header == null) {
+                System.out.println("The CSV file is empty.");
+                return;
             }
 
-            // Read and print first 5 records
-            int recordCount = 0;
-            while ((line = br.readLine()) != null) {
-                totalRecords++;
-                if (recordCount < 5) {
-                    String[] fields = line.split(",");
-                    for (String field : fields) {
-                        System.out.print(field + "\t");
-                    }
-                    System.out.println();
-                    recordCount++;
-                }
+            System.out.println("=== Data Preview ===\n");
+
+            // Print column headers
+            String[] headers = header.split(separator);
+            System.out.println("Columns:");
+            for (String col : headers) {
+                System.out.print(col + " ");
             }
 
-            System.out.println("\nTotal Records (excluding header): " + totalRecords);
+            System.out.println("\nTotal columns: " + headers.length);
+            System.out.println("\nFirst 5 Records:\n");
+
+            int rowCount = 0;
+
+            // Show first 5 rows
+            while ((line = br.readLine()) != null && rowCount < 5) {
+                String[] data = line.split(separator);
+                System.out.println(String.join(" ", data));
+                rowCount++;
+            }
+
+            // Count the rest
+            while (br.readLine() != null) {
+                rowCount++;
+            }
+
+            System.out.println("\nTotal Records (excluding header): " + rowCount);
 
         } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
+            System.err.println("Error reading the file:");
+            e.printStackTrace();
         }
     }
 }
